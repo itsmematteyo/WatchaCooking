@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Platform, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import { colors } from '../theme/colors';
 
+const LOGO = require('../../assets/font-without-logo.png');
 const MIN_SPLASH_MS = 1500;
 
 function Dot({ delay }: { delay: number }) {
@@ -49,12 +50,14 @@ export default function Splash() {
 
     return (
         <View style={styles.container}>
-            {/* PLACEHOLDER: replace with the real logo image later */}
-            <View style={styles.logoBox}>
-                <Text style={styles.logoText}>Logo</Text>
-            </View>
+            <Image source={LOGO} style={styles.logo} resizeMode="contain" />
 
-            <Text style={styles.title}>Watcha Cooking?</Text>
+            <View style={styles.titleWrap}>
+                <Text style={styles.title}>Watcha</Text>
+                <Text style={styles.title}>
+                    Cooking<Text style={styles.mark}>?</Text>
+                </Text>
+            </View>
 
             <View style={styles.dots}>
                 <Dot delay={0} />
@@ -75,25 +78,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 24,
     },
-    logoBox: {
-        width: 110,
-        height: 110,
-        borderRadius: 28,
-        borderWidth: 2,
-        borderStyle: 'dashed',
-        borderColor: colors.brownSoft,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 20,
-    },
-    logoText: { color: colors.brownSoft, fontSize: 14 },
+    logo: { width: 420, height: 390, marginBottom: 0 },
+    titleWrap: { alignItems: 'center', marginTop: -40, marginBottom: 26 },
     title: {
-        fontFamily: Platform.select({ ios: 'Georgia', android: 'serif' }),
-        fontSize: 34,
-        fontWeight: '700',
+        fontFamily: 'Fredoka_700Bold',
+        fontSize: 44,
+        lineHeight: 46,
         color: colors.brown,
-        marginBottom: 24,
+        textAlign: 'center',
     },
+    mark: { color: colors.orange },
     dots: { flexDirection: 'row', gap: 8, marginBottom: 16, height: 20, alignItems: 'flex-end' },
     dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.orange },
     tagline: { fontSize: 14, color: colors.brownSoft },

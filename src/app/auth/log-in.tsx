@@ -1,4 +1,4 @@
-    import { useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator, KeyboardAvoidingView, Platform, Pressable,
   ScrollView, StyleSheet, Text, View,
@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../../lib/supabase';
 import { colors } from '../../theme/colors';
 import TextField from '../../components/TextField';
+import LoadingOverlay from '../../components/LoadingOverlay';
 
 type Errors = { email?: string; password?: string; form?: string };
 
@@ -46,7 +47,8 @@ export default function LogIn() {
       return;
     }
 
-    router.replace('/(tabs)');
+    if (router.canDismiss()) router.dismissAll();
+    router.replace('/tabs');
   }
 
   return (
@@ -54,6 +56,7 @@ export default function LogIn() {
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {/* <LoadingOverlay visible={loading} label="Logging in..." /> */}
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ padding: 20, paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 }}
@@ -63,7 +66,8 @@ export default function LogIn() {
           <Text style={styles.backText}>‹</Text>
         </Pressable>
 
-        <Text style={styles.title}>Welcome back</Text>
+        <Text style={styles.title}>Welcome!</Text>
+        <Text style={styles.subtitle}>Hello there! Join in and share your own recipes.</Text>
 
         <TextField
           label="Email"
@@ -101,7 +105,7 @@ export default function LogIn() {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>New here? </Text>
-          <Pressable onPress={() => router.replace('/(auth)/sign-up')}>
+          <Pressable onPress={() => router.replace('/auth/sign-up')}>
             <Text style={styles.link}>Sign up</Text>
           </Pressable>
         </View>
@@ -119,9 +123,10 @@ const styles = StyleSheet.create({
   },
   backText: { fontSize: 26, color: colors.brown, marginTop: -3 },
   title: {
-    fontFamily: 'serif', fontSize: 28, fontWeight: '700',
-    color: colors.brown, marginBottom: 18,
+    fontFamily: 'Fredoka_700Bold', fontSize: 28,
+    color: colors.brown, marginBottom: 6, marginTop: 5,
   },
+  subtitle: { fontSize: 15, color: colors.brownSoft, lineHeight: 21, marginBottom: 24 },
   formError: { color: colors.error, fontWeight: '600', marginBottom: 10 },
   btn: {
     backgroundColor: colors.brown, borderRadius: 999, paddingVertical: 15,

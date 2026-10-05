@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../../lib/supabase';
 import { colors } from '../../theme/colors';
 import TextField from '../../components/TextField';
+import LoadingOverlay from '../../components/LoadingOverlay';
 
 type Errors = {
     username?: string;
@@ -71,9 +72,8 @@ export default function SignUp() {
             return;
         }
 
-        if (data.session) {
-            router.push('/tabs');
-        }
+        if (router.canDismiss()) router.dismissAll();
+        router.replace('/tabs');
     }
 
     return (
@@ -81,6 +81,7 @@ export default function SignUp() {
             style={styles.flex}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
+             {/* <LoadingOverlay visible={loading} label="Creating your account..." /> */}
             <ScrollView
                 style={styles.container}
                 contentContainerStyle={{ padding: 20, paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24 }}
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     },
     backText: { fontSize: 26, color: colors.brown, marginTop: -3 },
     title: {
-        fontFamily: 'serif', fontSize: 28, fontWeight: '700',
+        fontFamily: 'Fredoka_700Bold', fontSize: 28,
         color: colors.brown, marginBottom: 18,
     },
     formError: { color: colors.error, fontWeight: '600', marginBottom: 10 },

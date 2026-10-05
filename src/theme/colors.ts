@@ -5,6 +5,8 @@ export const colors = {
     orange: '#E8832A',
     green: '#4F7F32',
     white: '#FFFFFF',
+    orangeDark: '#B85F12',
+    chipBg: '#FBF3E4',   
 
     brownSoft: '#7A5A44',
     creamDark: '#EFD9B6',

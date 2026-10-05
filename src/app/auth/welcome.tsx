@@ -1,20 +1,62 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import {
+    FlatList, Image, NativeScrollEvent, NativeSyntheticEvent,
+    Pressable, StyleSheet, Text, View, useWindowDimensions,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
 
+const SLIDES = [require('../../../assets/chicken.jpg'), require('../../../assets/pasta.jpg'), require('../../../assets/salad.jpg')];
+const AUTO_MS = 3500;
+
 export default function Welcome() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
+    const { width } = useWindowDimensions();
+    const listRef = useRef<FlatList>(null);
+    const [index, setIndex] = useState(0);
+    const [dragging, setDragging] = useState(false);
+
+    const onScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        setIndex(Math.round(e.nativeEvent.contentOffset.x / width));
+        setDragging(false);
+    };
+
+    useEffect(() => {
+        if (SLIDES.length < 2 || dragging) return;
+        const t = setTimeout(() => {
+            const next = (index + 1) % SLIDES.length;
+            listRef.current?.scrollToIndex({ index: next, animated: true });
+            setIndex(next);
+        }, AUTO_MS);
+        return () => clearTimeout(t);
+    }, [index, dragging]);
 
     return (
         <View style={styles.container}>
-            {/* PLACEHOLDER: replace with a real photo, for example
-          <Image source={require('../../../assets/welcome.jpg')} style={styles.photo} /> */}
             <View style={styles.photo}>
-                <Text style={styles.photoText}>Food photo</Text>
+                <FlatList
+                    ref={listRef}
+                    data={SLIDES}
+                    keyExtractor={(_, i) => String(i)}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    onScrollBeginDrag={() => setDragging(true)}
+                    onMomentumScrollEnd={onScrollEnd}
+                    getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
+                    style={{ width }}
+                    renderItem={({ item }) => (
+                        <Image source={item} style={{ width, height: '100%' }} resizeMode="cover" />
+                    )}
+                />
+                <View style={styles.dots}>
+                    {SLIDES.map((_, i) => (
+                        <View key={i} style={[styles.dot, i === index && styles.dotActive]} />
+                    ))}
+                </View>
             </View>
-
             <View style={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
                 <View>
                     <Text style={styles.title}>Cook what your family loves</Text>
@@ -50,8 +92,8 @@ const styles = StyleSheet.create({
     photo: {
         flex: 1,
         backgroundColor: colors.creamDark,
-        borderBottomLeftRadius: 36,
-        borderBottomRightRadius: 36,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
@@ -64,9 +106,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     title: {
-        fontFamily: 'serif',
+        fontFamily: 'Fredoka_700Bold',
         fontSize: 30,
-        fontWeight: '700',
         color: colors.brown,
         marginBottom: 8,
     },
@@ -84,4 +125,10 @@ const styles = StyleSheet.create({
     btnOutline: { backgroundColor: 'transparent' },
     btnOutlineText: { color: colors.brown, fontSize: 16, fontWeight: '700' },
     pressed: { opacity: 0.8 },
+    dots: {
+        position: 'absolute', bottom: 20, left: 0, right: 0,
+        flexDirection: 'row', justifyContent: 'center', gap: 8,
+    },
+    dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.55)' },
+    dotActive: { width: 22, backgroundColor: colors.white },
 });
